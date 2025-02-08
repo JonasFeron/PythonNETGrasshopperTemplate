@@ -84,6 +84,7 @@ namespace MyGrasshopperPlugin.PythonNETComponents
 
             var twinData = new TwinData(list, row, col);
             string jsonData = JsonConvert.SerializeObject(twinData, Formatting.None);
+            // Another way to convert the data from C# to Python (and back) exists if required: https://pythonnet.github.io/pythonnet/codecs.html
 
             var twinResult = new TwinResult();
             dynamic jsonResult = null;
