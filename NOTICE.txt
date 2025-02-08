@@ -1,18 +1,20 @@
-﻿pythonnetGrasshopperTemplate Licensing
+﻿PythonNETGrasshopperTemplate Licensing
 ============================================
 
-This file attempts to include all licenses that apply within pythonnetGrasshopperTemplate (this program) source tree, in particular any that are supposed to be exposed to the end user for credit requirements for instance. 
+This file attempts to include all licenses that apply within PythonNETGrasshopperTemplate (this program) source tree, in particular any that are supposed to be exposed to the end user for credit requirements for instance. 
 
-
+PythonNETGrasshopperTemplate simplifies the development of Grasshopper plugins by integrating C# and Python.NET for seamless execution of Python scripts. 
+Built on Python.NET and the official Grasshopper template, it enables direct access to Python libraries like NumPy and Pandas by embedding Python within C# Grasshopper components. 
+Designed for efficiency, it supports Rhino 7 and 8, making plugin development in Visual Studio more structured and manageable.
 
 Copyright (C) <2025> <Jonas Feron>
 
-The development of pythonnetGrasshopperTemplate has been done by Jonas FERON, hereafter the AUTHOR.
+The development of PythonNETGrasshopperTemplate has been done by Jonas FERON, hereafter the AUTHOR.
 
-Website of Jonas FERON: https://github.com/JonasFeron/pythonnetGrasshopperTemplate
+Website of Jonas FERON: https://github.com/JonasFeron/PythonNETGrasshopperTemplate
 Contact: jonas.feron@gmail.com	 
 
-pythonnetGrasshopperTemplate General
+PythonNETGrasshopperTemplate General
 -----------------------------------------
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +32,7 @@ limitations under the License.
 
 [The documentation for this program is under a creative commons attribution share-alike
 4.0 license.  http://creativecommons.org/licenses/by-sa/4.0/
-It can be found here:  https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate]
+It can be found here:  https://github.com/JonasFeron/PythonNETGrasshopperTemplate]
 *************************************************************************
 
 This program has dependencies on other libraries and Website depedencies which are or not under Apache License, Version 2.0 and that are commonly distributed with this program core libraries.
@@ -39,7 +41,7 @@ Dependencies are as follows:
 
 Grasshopper		Free of use	 	Special permission 	https://www.nuget.org/packages/Grasshopper/
 GrasshopperTemplate	Free of use	 	Special permission 	https://github.com/mcneel/RhinoVisualStudioExtensions/releases
-pythonnet					MIT			https://github.com/pythonnet/pythonnet
+Python.NET					MIT			https://github.com/pythonnet/pythonnet
 PythonConnectedGrasshopperTemplate		Apache License-2.0	https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate
 NumPy						BSD			https://numpy.org
 Newtonsoft.Json					MIT			https://github.com/JamesNK/Newtonsoft.Json
@@ -60,7 +62,7 @@ Finally, we do not typically see people add these references, but we do apprecia
 -----------------------------------------------------------------------------
 
 ####
-pythonnet
+Python.NET
 ####
 MIT License
 
