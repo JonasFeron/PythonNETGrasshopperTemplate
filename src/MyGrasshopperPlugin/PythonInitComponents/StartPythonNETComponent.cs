@@ -203,6 +203,10 @@ namespace MyGrasshopperPlugin.PythonInitComponents
             var pythonDllPath = AccessToAll.pythonDllPath;
             var pythonProjectDirectory = AccessToAll.pythonProjectDirectory;
 
+            string Lib = Path.Combine(condaEnvPath, "Lib");
+            string site_packages = Path.Combine(Lib, "site-packages");
+            string DLLs = Path.Combine(condaEnvPath, "DLLs");
+
             if (start && AccessToAll.hasPythonStarted)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Python.NET is already started.");
@@ -217,7 +221,7 @@ namespace MyGrasshopperPlugin.PythonInitComponents
                 }
                 Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.Process);
                 Environment.SetEnvironmentVariable("PYTHONHOME", condaEnvPath, EnvironmentVariableTarget.Process);
-                Environment.SetEnvironmentVariable("PYTHONPATH", $"{condaEnvPath}\\Lib\\site-packages;{condaEnvPath}\\Lib;{pythonProjectDirectory}", EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable("PYTHONPATH", $"{site_packages};{Lib};{DLLs};{pythonProjectDirectory}", EnvironmentVariableTarget.Process);
 
                 //Runtime.PythonDLL = pythonDllPath;
                 Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDllPath);
