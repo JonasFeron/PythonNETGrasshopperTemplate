@@ -20,7 +20,7 @@
 # this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used without modification.
 # ------------------------------------------------------------------------------------------------------------
 
-# Copyright <2021-2025> <Université catholique de Louvain (UCLouvain)>
+# Copyright <2021-2025> <UniversitÃ© catholique de Louvain (UCLouvain)>
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,25 +41,18 @@
 import numpy as np
 
 
-class TwinData():
-    def __init__(self, TypeName,
-                 AList,
-                 rowNumber,
-                 colNumber): #the Names of the __init__(arguments) must be identical to the Names of the TwinData properties in C#
+class TwinData:
+    def __init__(self, alist=None, row_number=0, col_number=0):
         """
-        Initialize all the properties of a TwinData Object.
-        A TwinData Object is an object that contains the same data in C# than in Python in order to communicate between the two languages via a file.txt encrypted in json format.
+        Initialize a TwinData object that matches the C# TwinData class structure.
+        Uses Python.NET's built-in conversion.
+        
+        Args:
+            alist (list): List of double values
+            row_number (int): Number of rows
+            col_number (int): Number of columns
         """
-        self.TypeName = TypeName
-        self.AList = np.array(AList, dtype=int)  #input arguments from C# are lists which are converted in numpy.array
-        self.rowNumber = rowNumber
-        self.colNumber = colNumber
-
-def ToTwinDataObject(dct):
-    """
-    Function that takes in a dictionary and returns a TwinData object associated to the dict.
-    """
-    if 'TwinData' in dct.values(): # if TypeName == 'TwinData':
-        return TwinData(**dct) #call the constructor of TwinData with all the values of the dictionnary.
-    return dct
-
+        self.AList = alist if alist is not None else []
+        self.RowNumber = row_number
+        self.ColNumber = col_number
+    

@@ -1,4 +1,4 @@
-﻿//PythonNETGrasshopperTemplate
+//PythonNETGrasshopperTemplate
 
 //Copyright <2025> <Jonas Feron>
 
@@ -42,6 +42,7 @@ using System;
 using Grasshopper.Kernel;
 using System.IO;
 using Python.Runtime;
+using MyGrasshopperPluginCore.PythonNET;
 
 namespace MyGrasshopperPlugin.PythonInitComponents
 {
@@ -52,9 +53,9 @@ namespace MyGrasshopperPlugin.PythonInitComponents
         {
             get
             {
-                if (AccessToAll.anacondaPath != null)
+                if (Config.anacondaPath != null)
                 {
-                    return AccessToAll.anacondaPath;
+                    return Config.anacondaPath;
                 }
                 else
                 {
@@ -67,9 +68,9 @@ namespace MyGrasshopperPlugin.PythonInitComponents
         {
             get
             {
-                if (AccessToAll.pythonDllName != null)
+                if (Config.pythonDllName != null)
                 {
-                    return AccessToAll.pythonDllName;
+                    return Config.pythonDllName;
                 }
                 else
                 {
@@ -138,21 +139,21 @@ namespace MyGrasshopperPlugin.PythonInitComponents
             #region Check Data
             AccessToAll.user_mode = _user_mode;
 
-            if (AccessToAll.user_mode && !Directory.Exists(AccessToAll.rootDirectory))
+            if (AccessToAll.user_mode && !Directory.Exists(Config.rootDirectory))
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check that {AccessToAll.GHAssemblyName} has been correctly installed in: {AccessToAll.specialFolder}");
                 return;
             }
-            if (!AccessToAll.user_mode && !Directory.Exists(AccessToAll.rootDirectory)) //Developer mode
+            if (!AccessToAll.user_mode && !Directory.Exists(Config.rootDirectory)) //Developer mode
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check the path to {AccessToAll.rootDirectory}");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check the path to {Config.rootDirectory}");
                 return;
             }
 
 
             try
             {
-                AccessToAll.anacondaPath = _anacondaPath;
+                Config.anacondaPath = _anacondaPath;
             }
             catch (ArgumentException e)
             {
@@ -168,70 +169,48 @@ namespace MyGrasshopperPlugin.PythonInitComponents
                     return;
                 }
             }
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"A valid Anaconda3 installation was found here: {AccessToAll.anacondaPath}");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"A valid Anaconda3 installation was found here: {Config.anacondaPath}");
 
 
             try
             {
-                AccessToAll.condaEnvName = _condaEnvName;
+                Config.condaEnvName = _condaEnvName;
             }
             catch (ArgumentException e)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
                 return;
             }
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"\"{AccessToAll.condaEnvName}\" is a valid anaconda environment");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"\"{Config.condaEnvName}\" is a valid anaconda environment");
 
 
             try
             {
-                AccessToAll.pythonDllName = _pythonDllName;
+                Config.pythonDllName = _pythonDllName;
             }
             catch (ArgumentException e)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
                 return;
             }
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"{AccessToAll.pythonDllName} is a valid .dll file");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"{Config.pythonDllName} is a valid .dll file");
 
 
             #endregion Check Data
 
 
             //3) Initialize Python.NET, following https://github.com/pythonnet/pythonnet/wiki/Using-Python.NET-with-Virtual-Environments
-            var condaEnvPath = AccessToAll.condaEnvPath;
-            var pythonDllPath = AccessToAll.pythonDllPath;
-            var pythonProjectDirectory = AccessToAll.pythonProjectDirectory;
 
-            string Lib = Path.Combine(condaEnvPath, "Lib");
-            string site_packages = Path.Combine(Lib, "site-packages");
-            string DLLs = Path.Combine(condaEnvPath, "DLLs");
-
-            if (start && AccessToAll.hasPythonStarted)
+            if (start && PythonNET.IsInitialized)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Python.NET is already started.");
                 return;
             }
-            if (start && !AccessToAll.hasPythonStarted) 
+            if (start && !PythonNET.IsInitialized) 
             {
-                var path = Environment.GetEnvironmentVariable("PATH").TrimEnd(';');
-                if (!path.Contains(condaEnvPath))
-                {
-                    path = string.IsNullOrEmpty(path) ? condaEnvPath : path + ";" + condaEnvPath; //add condaEnvPath to PATH (only once)
-                }
-                Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.Process);
-                Environment.SetEnvironmentVariable("PYTHONHOME", condaEnvPath, EnvironmentVariableTarget.Process);
-                Environment.SetEnvironmentVariable("PYTHONPATH", $"{site_packages};{Lib};{DLLs};{pythonProjectDirectory}", EnvironmentVariableTarget.Process);
+                PythonNET.Initialize(Config.condaEnvPath, Config.pythonDllName, Config.pythonProjectDirectory);
 
-                //Runtime.PythonDLL = pythonDllPath;
-                Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDllPath);
-
-                PythonEngine.PythonHome = condaEnvPath;
-                PythonEngine.PythonPath = Environment.GetEnvironmentVariable("PYTHONPATH", EnvironmentVariableTarget.Process);
-
-                PythonEngine.Initialize();
-                AccessToAll.hasPythonStarted = true;
-
+                
                 var m_threadState = PythonEngine.BeginAllowThreads();
                 using (Py.GIL())
                 {
@@ -244,9 +223,9 @@ namespace MyGrasshopperPlugin.PythonInitComponents
 
             if (!start)
             {
-                ClosePythonEngine();
+                PythonNET.ShutDown();
             }
-            if (!AccessToAll.hasPythonStarted)
+            if (!PythonNET.IsInitialized)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Python.NET is closed. Please restart Python.NET.");
             }
@@ -260,24 +239,7 @@ namespace MyGrasshopperPlugin.PythonInitComponents
         /// <param name="doc"></param>
         private void DocumentClose(GH_DocumentServer sender, GH_Document doc)
         {
-            ClosePythonEngine();
-        }
-        private void ClosePythonEngine()
-        {
-            if (!AccessToAll.hasPythonStarted) //Python has not been started
-            {
-                return; //nothing to do
-            }
-            //else Python has been started and must be closed
-            try
-            {
-                PythonEngine.Shutdown();
-            }
-            catch (Exception e)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Python.NET closed with this error message: {e.Message}");
-            }
-            AccessToAll.hasPythonStarted = false;
+            PythonNET.ShutDown();
         }
 
 

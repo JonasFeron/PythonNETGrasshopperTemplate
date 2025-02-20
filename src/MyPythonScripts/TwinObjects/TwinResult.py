@@ -16,11 +16,9 @@
 
 # List of the contributors to the development of PythonNETGrasshopperTemplate: see NOTICE file.
 # Description and complete License: see NOTICE file.
-
-# this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used without modification.
 # ------------------------------------------------------------------------------------------------------------
 
-# Copyright <2021-2025> <Université catholique de Louvain (UCLouvain)>
+# Copyright <2021-2025> <UniversitÃ© catholique de Louvain (UCLouvain)>
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,26 +39,13 @@
 import json
 import numpy as np
 
-class TwinResult():
-    def __init__(self):
+class TwinResult:
+    def __init__(self, matrix=None):
         """
-        initialise empty TwinResult
+        Initialize a TwinResult object that matches the C# TwinResult class structure.
+        Uses Python.NET's built-in conversion.
+        
+        Args:
+            matrix (list): List of lists containing the result matrix
         """
-        self.TypeName = "TwinResult"
-        self.Matrix = []
-
-    def populate_with(self, array):
-        if isinstance(array, np.ndarray):
-            self.Matrix = array.tolist()
-
-
-
-class TwinResultEncoder(json.JSONEncoder):
-    """
-    The TwinResultEncoder class is used to record all the properties of a TwinResult object in a dictionary and send them to C#.
-    """
-    def default(self, obj):
-        if isinstance(obj, TwinResult):
-            return obj.__dict__ # obj.__dct__ = {'property': value, ...}
-        else : # Let the base class default method raise the TypeError
-            return json.JSONEncoder.default(self, obj)
+        self.Matrix = matrix if matrix is not None else np.array([])

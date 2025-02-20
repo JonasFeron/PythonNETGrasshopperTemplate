@@ -1,4 +1,4 @@
-﻿//PythonNETGrasshopperTemplate
+//PythonNETGrasshopperTemplate
 
 //Copyright <2025> <Jonas Feron>
 
@@ -44,7 +44,7 @@ using System.IO;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
-using MyGrasshopperPlugin.PythonNETComponents.TwinObjects;
+using MyGrasshopperPluginCore.TwinObjects;
 using Newtonsoft.Json;
 using Python.Runtime;
 
@@ -105,49 +105,41 @@ namespace MyGrasshopperPlugin.PythonNETComponents
             if (!DA.GetData(2, ref col)) { return; }
 
             var twinData = new TwinData(list, row, col);
-            string jsonData = JsonConvert.SerializeObject(twinData, Formatting.None);
-            // Another way to convert the data from C# to Python (and back) exists if required: https://pythonnet.github.io/pythonnet/codecs.html
+            TwinResult twinResult = null;
 
-            var twinResult = new TwinResult();
-            dynamic jsonResult = null;
-
-            //2) Solve in python
+            //2) Solve in python using Python.NET's built-in conversion
             var m_threadState = PythonEngine.BeginAllowThreads();
 
-            // following code is inspired by https://github.com/pythonnet/pythonnet/wiki/Threading
-            // Don't access Python up here.
             using (Py.GIL())
             {
-                // Safe to access Python here.
                 try
                 {
+                    PyObject pyData = twinData.ToPython();
                     dynamic script = PyModule.Import(pythonScript);
-                    dynamic mainFunction = script.main_json_example;
-                    jsonResult = mainFunction(jsonData);
-                    JsonConvert.PopulateObject((string)jsonResult, twinResult);
+                    dynamic mainFunction = script.main;
+                    dynamic pyResult = mainFunction(pyData);
+                    twinResult = pyResult.As<TwinResult>();
                 }
                 catch (PythonException ex)
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                    return;
                 }
                 catch (Exception e)
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"python result= {jsonResult}");
                     return;
                 }
             }
-            // The following is unsafe: it is accessing a Python attribute without holding the GIL.
-            //DA.SetData(0, jsonResult);
 
             PythonEngine.EndAllowThreads(m_threadState);
 
-
             //3) postprocess and return the result to Grasshopper
-            List<List<double>> matrix = twinResult.Matrix;
-            GH_Structure<GH_Number> gh_structure = TwinResult.ListListToGH_Struct(matrix); //convert the result into a Grasshopper tree
-
-            DA.SetDataTree(0, gh_structure);
+            if (twinResult != null)
+            {
+                GH_Structure<GH_Number> gh_structure = TwinResult.ListListToGH_Struct(twinResult.Matrix);
+                DA.SetDataTree(0, gh_structure);
+            }
         }
 
 
