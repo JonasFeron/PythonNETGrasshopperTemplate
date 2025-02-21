@@ -10,7 +10,7 @@ using MyGrasshopperPluginCore.Application.PythonNETSolvers;
 namespace MyGrasshopperPluginTests.Application
 {
     [TestClass]
-    public class PythonNETSolverTests
+    public class ComplexScriptSolverTests
     {
         private static string condaEnvPath; 
         private static string pythonDllName;
@@ -34,7 +34,7 @@ namespace MyGrasshopperPluginTests.Application
         }
 
         [TestMethod]
-        public void TestTwinDataConversion()
+        public void TestCS_PyConversion()
         {
             // Create test data
             var inputList = new List<double> { 1.0, 2.0, 3.0, 4.0 };

@@ -45,12 +45,14 @@ namespace MyGrasshopperPluginCore.Converters
 
                     // Then convert to C# list
                     var matrix = new List<List<double>>();
-                    foreach (object row in pyList)
+                    PyList pyListObj = new PyList(pyList);
+                    foreach (PyObject rowObj in pyListObj)
                     {
                         var rowList = new List<double>();
-                        foreach (object val in row)
+                        PyList rowPyList = new PyList(rowObj);
+                        foreach (PyObject val in rowPyList)
                         {
-                            rowList.Add((double)val);
+                            rowList.Add(val.As<double>());
                         }
                         matrix.Add(rowList);
                     }
