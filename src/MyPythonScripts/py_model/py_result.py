@@ -48,7 +48,3 @@ class Py_Result:
             matrix (array): numpy array containing the result matrix
         """
         self.matrix = matrix if matrix is not None else np.array([])
-
-    # def toCS(self):
-    #     listlist = self.matrix.tolist() # convert numpy arrays into list of list for C#
-    #     return Py_Result(listlist)
