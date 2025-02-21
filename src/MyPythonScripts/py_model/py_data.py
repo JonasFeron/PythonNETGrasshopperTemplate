@@ -17,7 +17,7 @@
 # List of the contributors to the development of PythonNETGrasshopperTemplate: see NOTICE file.
 # Description and complete License: see NOTICE file.
 
-# this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used without modification.
+# this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used with modification.
 # ------------------------------------------------------------------------------------------------------------
 
 # Copyright <2021-2025> <Université catholique de Louvain (UCLouvain)>

@@ -70,9 +70,6 @@ namespace MyGrasshopperPlugin
         public static string GHComponentsFolder1 { get { return "1. Main Components"; } } 
 
 
-        #region Properties
-
-
         /// <summary>
         /// Gets or sets a value indicating whether the plugin is in user mode.
         /// True for user mode, false for developer mode.
@@ -104,7 +101,7 @@ namespace MyGrasshopperPlugin
                 }
                 else
                 {
-                    var currentDirectory = Directory.GetCurrentDirectory(); //rootDirectory/MyGrasshopperPlugIn/bin/Debug/net48/
+                    var currentDirectory = Directory.GetCurrentDirectory(); //rootDirectory/MyGrasshopperPlugin/bin/Debug/net48/
                     for (int i = 0; i < 4; i++) //rootDirectory is 4 levels above the current directory
                     {
                         currentDirectory = Directory.GetParent(currentDirectory).FullName;
@@ -127,7 +124,7 @@ namespace MyGrasshopperPlugin
             get { return Path.Combine(rootDirectory, ".temp"); }
         }
 
-        #endregion Properties
+
 
 
 

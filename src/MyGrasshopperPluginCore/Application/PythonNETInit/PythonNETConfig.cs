@@ -20,7 +20,7 @@
 //this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used WITH modifications.
 //------------------------------------------------------------------------------------------------------------
 
-//Copyright < 2021 - 2025 > < Universit� catholique de Louvain (UCLouvain)>
+//Copyright < 2021 - 2025 > < Université catholique de Louvain (UCLouvain)>
 
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 //List of the contributors to the development of PythonConnectedGrasshopperTemplate: see NOTICE file.
 //Description and complete License: see NOTICE file.
 //------------------------------------------------------------------------------------------------------------
+
 
 using System;
 using System.Collections.Generic;
