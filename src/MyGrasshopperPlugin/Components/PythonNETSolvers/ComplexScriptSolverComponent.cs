@@ -85,18 +85,18 @@ namespace MyGrasshopperPlugin.Components
                 return;
             }
 
-            var list = new List<GH_Number>();
+            var branch = new List<GH_Number>();
             int row = 0;
             int col = 0;
 
-            if (!DA.GetDataList(0, list)) { return; }
+            if (!DA.GetDataList(0, branch)) { return; }
             if (!DA.GetData(1, ref row)) { return; }
             if (!DA.GetData(2, ref col)) { return; }
 
             var csResult = new CS_Result();
             try
             {
-                var csData = new CS_Data(GHNumberConvert.ToList(list), row, col);
+                var csData = new CS_Data(GHNumberConvert.ToArray(branch), row, col);
                 csResult = ComplexScriptSolver.Solve(csData);
             }
             catch (Exception ex)

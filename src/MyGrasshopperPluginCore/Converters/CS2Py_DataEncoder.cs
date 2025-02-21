@@ -42,7 +42,7 @@ namespace MyGrasshopperPluginCore.Converters
 
                 // Create a new instance of py_data with our C# data
                 return pyModel.Py_Data(
-                    data.AList,
+                    data.Array,
                     data.RowNumber,
                     data.ColNumber
                 );

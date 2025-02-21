@@ -19,6 +19,7 @@
 
 using MyGrasshopperPluginCore.CS_Model;
 using Python.Runtime;
+using System.Runtime.InteropServices;
 
 namespace MyGrasshopperPluginCore.Converters
 {
@@ -55,7 +56,8 @@ namespace MyGrasshopperPluginCore.Converters
                     dynamic py = pyObj.As<dynamic>();
                     dynamic npArray = py.matrix;
                     
-                    var matrix = ToListList(npArray);
+                    //var matrix = npArray.As<double[,]>(); does not work
+                    var matrix = ToCSArray2D(npArray);
 
                     value = (T)(object)new CS_Result { Matrix = matrix };
                     return true;
@@ -68,10 +70,8 @@ namespace MyGrasshopperPluginCore.Converters
             }
         }
 
-        private static List<List<double>> ToListList(dynamic npArray)
+        private static double[,] ToCSArray2D(dynamic npArray)
         {
-            var matrix = new List<List<double>>();
-
             // Get array dimensions
             var shape = ((PyObject)npArray.shape).As<int[]>();
             if (shape.Length != 2)
@@ -79,15 +79,15 @@ namespace MyGrasshopperPluginCore.Converters
                 throw new ArgumentException("Expected 2D numpy array");
             }
 
-            // Get flat array of data
+            // Get the numpy array data directly as a contiguous array
             var flatData = ((PyObject)npArray.ravel()).As<double[]>();
-
-            // Convert flat array to List<List<double>> given the shape of npArray
-            for (int i = 0; i < shape[0]; i++)
-            {
-                matrix.Add(flatData.Skip(i * shape[1]).Take(shape[1]).ToList());
-            }
-
+            
+            // Create the 2D array with the correct dimensions
+            var matrix = new double[shape[0], shape[1]];
+            
+            // Copy the data directly into the 2D array
+            Buffer.BlockCopy(flatData, 0, matrix, 0, flatData.Length * sizeof(double));
+            
             return matrix;
         }
     }

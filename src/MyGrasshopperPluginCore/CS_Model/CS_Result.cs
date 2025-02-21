@@ -46,18 +46,16 @@ namespace MyGrasshopperPluginCore.CS_Model
     /// </summary>
     public class CS_Result
     {
-
-        public List<List<double>> Matrix { get; set; } = new List<List<double>>();
+        public double[,] Matrix { get; set; } = new double[0, 0];
 
         public CS_Result()
         {
-            Matrix = new List<List<double>>();
+            Matrix = new double[0, 0];
         }
 
-        public CS_Result(List<List<double>> matrix)
+        public CS_Result(double[,] matrix)
         {
             Matrix = matrix;
         }
-
     }
 }

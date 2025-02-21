@@ -1,4 +1,4 @@
-﻿//PythonNETGrasshopperTemplate
+//PythonNETGrasshopperTemplate
 
 //Copyright <2025> <Jonas Feron>
 
@@ -18,6 +18,7 @@
 //Description and complete License: see NOTICE file.
 //------------------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Grasshopper.Kernel.Types;
@@ -27,24 +28,33 @@ namespace MyGrasshopperPlugin.Converters
 {
     public static class GHNumberConvert
     {
-        public static GH_Structure<GH_Number> ToTree(List<List<double>> matrix)
+        public static GH_Structure<GH_Number> ToTree(double[,] matrix)
         {
             GH_Structure<GH_Number> tree = new GH_Structure<GH_Number>();
-            for (int i = 0; i < matrix.Count; i++)
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+            for (int i = 0; i < rows; i++)
             {
                 GH_Path path = new GH_Path(i);
-                List<GH_Number> branch = ToBranch(matrix[i]);
+                List<GH_Number> branch = new List<GH_Number>(cols);
+                for (int j = 0; j < cols; j++)
+                {
+                    branch.Add(new GH_Number(matrix[i, j]));
+                }
                 tree.AppendRange(branch, path);
             }
             return tree;
         }
-        public static List<GH_Number> ToBranch(List<double> aList)
+
+        public static List<GH_Number> ToBranch(double[] array)
         {
-            return aList.Select(n => new GH_Number(n)).ToList();
+            return array.Select(n => new GH_Number(n)).ToList();
         }
-        public static List<double> ToList(List<GH_Number> aList)
+
+        public static double[] ToArray(List<GH_Number> branch)
         {
-            return aList.Select(n => n.Value).ToList();
+            return branch.Select(n => n.Value).ToArray();
         }
     }
 }

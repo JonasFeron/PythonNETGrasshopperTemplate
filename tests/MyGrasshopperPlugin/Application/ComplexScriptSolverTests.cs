@@ -56,12 +56,12 @@ namespace MyGrasshopperPluginTests.Application
         public void TestCS_PyConversion()
         {
             // Create test data
-            var inputList = new List<double> { 1.0, 2.0, 3.0, 4.0 };
+            var inputArray = new double [6] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
             var csData = new CS_Data
             {
-                AList = inputList,
+                Array = inputArray,
                 RowNumber = 2,
-                ColNumber = 2
+                ColNumber = 3
             };
 
             CS_Result result = new CS_Result();
@@ -78,13 +78,17 @@ namespace MyGrasshopperPluginTests.Application
             // Verify the result
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Matrix);
-            Assert.AreEqual(2, result.Matrix.Count); // Number of rows
-            Assert.AreEqual(2, result.Matrix[0].Count); // Number of columns
+            Assert.AreEqual(2, result.Matrix.GetLength(0)); // Number of rows
+            Assert.AreEqual(3, result.Matrix.GetLength(1)); // Number of columns
 
-            Assert.AreEqual(inputList[0], result.Matrix[0][0]); // 1.0 
-            Assert.AreEqual(inputList[1], result.Matrix[0][1]); // 2.0 
-            Assert.AreEqual(inputList[2], result.Matrix[1][0]); // 3.0 
-            Assert.AreEqual(inputList[3], result.Matrix[1][1]); // 4.0 
+            Assert.AreEqual(inputArray[0], result.Matrix[0,0]); // 1.0 
+            Assert.AreEqual(inputArray[1], result.Matrix[0,1]); // 2.0 
+            Assert.AreEqual(inputArray[2], result.Matrix[0,2]); // 3.0 
+
+            Assert.AreEqual(inputArray[3], result.Matrix[1,0]); // 4.0 
+            Assert.AreEqual(inputArray[4], result.Matrix[1,1]); // 5.0 
+            Assert.AreEqual(inputArray[5], result.Matrix[1,2]); // 6.0 
+
         }
     }
 }

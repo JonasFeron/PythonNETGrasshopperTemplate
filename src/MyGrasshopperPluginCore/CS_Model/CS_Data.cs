@@ -45,7 +45,7 @@ namespace MyGrasshopperPluginCore.CS_Model
     {
 
         #region Properties
-        public List<double> AList { get; set; } = new List<double>();
+        public double[] Array { get; set; } = System.Array.Empty<double>();
         public int RowNumber { get; set; }
         public int ColNumber { get; set; }
         #endregion Properties
@@ -53,14 +53,14 @@ namespace MyGrasshopperPluginCore.CS_Model
         #region Constructors
         public CS_Data()
         {
-            AList = new List<double>();
+            Array = System.Array.Empty<double>();
             RowNumber = 0;
             ColNumber = 0;
         }
 
-        public CS_Data(List<double> list, int rowNumber, int colNumber)
+        public CS_Data(double[] array, int rowNumber, int colNumber)
         {
-            AList = list;
+            Array = array;
             RowNumber = rowNumber;
             ColNumber = colNumber;
         }
