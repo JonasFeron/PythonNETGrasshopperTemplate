@@ -40,14 +40,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Grasshopper.Kernel;
-using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
-using MyGrasshopperPluginCore.TwinObjects;
-using Newtonsoft.Json;
-using Python.Runtime;
-
+using static MyGrasshopperPlugin.GH_Model.Convert;
+using MyGrasshopperPluginCore.Application;
+using MyGrasshopperPluginCore.CS_Model;
+using MyGrasshopperPluginCore.PythonNET;
 
 namespace MyGrasshopperPlugin.PythonNETComponents
 {
@@ -81,18 +79,17 @@ namespace MyGrasshopperPlugin.PythonNETComponents
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string pythonScript = "complex_script"; // ensure that the python script is located in AccessToAll.pythonProjectDirectory, or provide the relative path to the script.
 
-            if (!AccessToAll.hasPythonStarted)
+            if (!PythonNET.IsInitialized)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Python has not been started. Please start the 'StartPython.NET' component first.");
                 return;
             }
-            if (!File.Exists(Path.Combine(AccessToAll.pythonProjectDirectory, pythonScript+".py")))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Please ensure that \"{pythonScript}\" is located in: {AccessToAll.pythonProjectDirectory}");
-                return;
-            }
+            //if (!File.Exists(Path.Combine(AccessToAll.pythonProjectDirectory, pythonScript+".py")))
+            //{
+            //    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Please ensure that \"{pythonScript}\" is located in: {AccessToAll.pythonProjectDirectory}");
+            //    return;
+            //}
 
             //1) Collect Data
 
@@ -104,42 +101,12 @@ namespace MyGrasshopperPlugin.PythonNETComponents
             if (!DA.GetData(1, ref row)) { return; }
             if (!DA.GetData(2, ref col)) { return; }
 
-            var twinData = new TwinData(list, row, col);
-            TwinResult twinResult = null;
+            var csData = new CS_Data(ToDouble(list), row, col);
 
-            //2) Solve in python using Python.NET's built-in conversion
-            var m_threadState = PythonEngine.BeginAllowThreads();
+            var csResult = new CS_Result();
+            csResult = PythonNETSolver.SolveComplexScript(csData);
 
-            using (Py.GIL())
-            {
-                try
-                {
-                    PyObject pyData = twinData.ToPython();
-                    dynamic script = PyModule.Import(pythonScript);
-                    dynamic mainFunction = script.main;
-                    dynamic pyResult = mainFunction(pyData);
-                    twinResult = pyResult.As<TwinResult>();
-                }
-                catch (PythonException ex)
-                {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
-                    return;
-                }
-            }
-
-            PythonEngine.EndAllowThreads(m_threadState);
-
-            //3) postprocess and return the result to Grasshopper
-            if (twinResult != null)
-            {
-                GH_Structure<GH_Number> gh_structure = TwinResult.ListListToGH_Struct(twinResult.Matrix);
-                DA.SetDataTree(0, gh_structure);
-            }
+            DA.SetDataTree(0, ToTree(csResult.Matrix));
         }
 
 

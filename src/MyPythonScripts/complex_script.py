@@ -38,13 +38,12 @@
 
 import sys
 import numpy as np
-import json
 
-from TwinObjects.TwinData import TwinData
-from TwinObjects.TwinResult import TwinResult
+from py_model.py_data import Py_Data
+from py_model.py_result import Py_Result
 
 
-def main(twin_data):
+def main(data):
     """
     Process the input data using Python.NET's built-in conversion.
     
@@ -54,10 +53,10 @@ def main(twin_data):
     Returns:
         TwinResult: Processed data to be sent back to C#
     """
-    twin_result = TwinResult()
+    py_result = Py_Result()
     # Convert input to numpy array
-    if isinstance(twin_data, TwinData):
-        twin_result.Matrix = np.array(twin_data.AList).reshape(twin_data.RowNumber, twin_data.ColNumber)
-        return twin_result    
+    if isinstance(data, Py_Data):
+        py_result.matrix = np.array(data.array).reshape(data.row_number, data.col_number)
+        return py_result 
     else:
-        raise TypeError("Input is not a TwinData object")
+        raise TypeError("Input is not a Py_Data object")

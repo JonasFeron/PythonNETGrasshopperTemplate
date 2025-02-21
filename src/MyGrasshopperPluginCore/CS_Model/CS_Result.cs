@@ -38,49 +38,26 @@
 //Description and complete License: see NOTICE file.
 //------------------------------------------------------------------------------------------------------------
 
-using Grasshopper.Kernel.Data;
-using Grasshopper.Kernel.Types;
-using Rhino.Geometry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MyGrasshopperPluginCore.TwinObjects
+namespace MyGrasshopperPluginCore.CS_Model
 {
     /// <summary>
-    /// A Twin result object is used to transfer results between Python and C# using Python.NET's built-in conversion.
+    /// A CS result object is used to transfer results between Python and C# using Python.NET's built-in conversion.
     /// </summary>
-    public class TwinResult
+    public class CS_Result
     {
-        public List<List<double>> Matrix { get; set; }
 
-        public TwinResult()
-        {
-            Init();
-        }
+        public List<List<double>> Matrix { get; set; } = new List<List<double>>();
 
-        private void Init()
+        public CS_Result()
         {
             Matrix = new List<List<double>>();
         }
 
-        /// <summary>
-        /// Converts a list of lists of doubles to a Grasshopper structure of GH_Numbers.
-        /// </summary>
-        /// <param name="matrix">The list of lists of doubles to convert.</param>
-        /// <returns>A GH_Structure containing the converted GH_Numbers.</returns>
-        public static GH_Structure<GH_Number> ListListToGH_Struct(List<List<double>> matrix)
+        public CS_Result(List<List<double>> matrix)
         {
-            GH_Structure<GH_Number> tree = new GH_Structure<GH_Number>();
-            for (int i = 0; i < matrix.Count; i++)
-            {
-                GH_Path path = new GH_Path(i);
-                List<GH_Number> branch = matrix[i].Select(x => new GH_Number(x)).ToList();
-                tree.AppendRange(branch, path);
-            }
-            return tree;
+            Matrix = matrix;
         }
+
     }
 }

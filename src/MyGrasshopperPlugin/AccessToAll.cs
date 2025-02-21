@@ -20,7 +20,7 @@
 //this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used WITH modifications.
 //------------------------------------------------------------------------------------------------------------
 
-//Copyright < 2021 - 2025 > < Université catholique de Louvain (UCLouvain)>
+//Copyright < 2021 - 2025 > < Universitï¿½ catholique de Louvain (UCLouvain)>
 
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ using Grasshopper.Kernel;
 
 namespace MyGrasshopperPlugin
 {
+
+
 
     /// <summary>
     /// the class AccessToAll contains the properties and methods accessible from all Grasshopper components.

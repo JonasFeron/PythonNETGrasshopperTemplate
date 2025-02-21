@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyGrasshopperPluginCore.PythonNET;
-using MyGrasshopperPluginCore.TwinObjects;
+using MyGrasshopperPluginCore.CS_Model;
+using MyGrasshopperPluginCore.Application;
 
 using Python.Runtime;
 
-namespace MyGrasshopperPluginTests.TwinObjects
+namespace MyGrasshopperPluginTests.Application
 {
     [TestClass]
-    public class TwinDataConversionTests
+    public class PythonNETSolverTests
     {
         private static string condaEnvPath; 
         private static string pythonDllName;
@@ -38,35 +39,23 @@ namespace MyGrasshopperPluginTests.TwinObjects
         {
             // Create test data
             var inputList = new List<double> { 1.0, 2.0, 3.0, 4.0 };
-            var twinData = new TwinData
+            var csData = new CS_Data
             {
                 AList = inputList,
                 RowNumber = 2,
                 ColNumber = 2
             };
 
-            TwinResult result = null;
-
-            // Add script directory to Python path
-            using (Py.GIL())
+            CS_Result result = new CS_Result();
+            try
             {
-                try
-                {
-                    // Convert C# object to Python
-                    PyObject pyTwinData = twinData.ToPython();
-
-                    // Import the Python script and call the main function
-                    dynamic complexScript = Py.Import("complex_script");
-                    dynamic pyResult = complexScript.main(pyTwinData);
-
-                    // Convert Python result back to C#
-                    result = pyResult.As<TwinResult>();
-                }
-                catch (PythonException ex)
-                {
-                    Assert.Fail($"Python error: {ex.Message}");
-                }
+                result = PythonNETSolver.SolveComplexScript(csData);
             }
+            catch (PythonException ex)
+            {
+                Assert.Fail($"Python error: {ex.Message}");
+            }
+            // Add script directory to Python path
 
             // Verify the result
             Assert.IsNotNull(result);

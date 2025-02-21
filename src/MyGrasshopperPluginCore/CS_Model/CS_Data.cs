@@ -17,7 +17,7 @@
 //List of the contributors to the development of PythonNETGrasshopperTemplate: see NOTICE file.
 //Description and complete License: see NOTICE file.
 
-//this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used WITHOUT modifications.
+//this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used WITH modifications.
 //------------------------------------------------------------------------------------------------------------
 
 //Copyright < 2021 - 2025 > < Université catholique de Louvain (UCLouvain)>
@@ -38,46 +38,32 @@
 //Description and complete License: see NOTICE file.
 //------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Grasshopper.Kernel.Types;
 
-
-namespace MyGrasshopperPluginCore.TwinObjects
+namespace MyGrasshopperPluginCore.CS_Model
 {
-    /// <summary>
-    /// A Twin data object is used to transfer data between the main Grasshopper/C# thread and the Python thread.
-    /// Uses Python.NET's built-in conversion methods for efficient data transfer.
-    /// </summary>
-    public class TwinData
+    public class CS_Data
     {
-        public List<double> AList { get; set; }
+
+        #region Properties
+        public List<double> AList { get; set; } = new List<double>();
         public int RowNumber { get; set; }
         public int ColNumber { get; set; }
+        #endregion Properties
 
-        public TwinData()
-        {
-            Init();
-        }
-
-        public TwinData(List<GH_Number> list, int rowNumber, int colNumber)
-        {
-            AList = list.Select(n => n.Value).ToList();
-            RowNumber = rowNumber;
-            ColNumber = colNumber;
-        }
-
-        /// <summary>
-        /// Initializes all properties to their default values.
-        /// </summary>
-        private void Init()
+        #region Constructors
+        public CS_Data()
         {
             AList = new List<double>();
             RowNumber = 0;
             ColNumber = 0;
         }
+
+        public CS_Data(List<double> list, int rowNumber, int colNumber)
+        {
+            AList = list;
+            RowNumber = rowNumber;
+            ColNumber = colNumber;
+        }
+        #endregion Constructors
     }
 }

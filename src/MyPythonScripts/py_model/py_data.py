@@ -16,6 +16,8 @@
 
 # List of the contributors to the development of PythonNETGrasshopperTemplate: see NOTICE file.
 # Description and complete License: see NOTICE file.
+
+# this file was imported from https://github.com/JonasFeron/PythonConnectedGrasshopperTemplate and is used without modification.
 # ------------------------------------------------------------------------------------------------------------
 
 # Copyright <2021-2025> <Université catholique de Louvain (UCLouvain)>
@@ -36,16 +38,20 @@
 # Description and complete License: see NOTICE file.
 # ------------------------------------------------------------------------------------------------------------
 
-import json
 import numpy as np
 
-class TwinResult:
-    def __init__(self, matrix=None):
+
+class Py_Data:
+    def __init__(self, alist=None, row_number=0, col_number=0):
         """
-        Initialize a TwinResult object that matches the C# TwinResult class structure.
-        Uses Python.NET's built-in conversion.
+        Initialize a py_data object that matches the C#_Data class.
         
         Args:
-            matrix (list): List of lists containing the result matrix
+            alist (list): List of double values
+            row_number (int): Number of rows
+            col_number (int): Number of columns
         """
-        self.Matrix = matrix if matrix is not None else np.array([])
+        self.array = np.array(alist,dtype=float) if alist is not None else np.array([])
+        self.row_number = row_number
+        self.col_number = col_number
+    

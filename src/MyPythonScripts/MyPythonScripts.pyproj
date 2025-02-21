@@ -23,18 +23,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="complex_script.py" />
+    <Compile Include="py_model\py_data.py" />
+    <Compile Include="py_model\py_result.py" />
     <Compile Include="test_script.py" />
-    <Compile Include="TwinObjects\TwinData.py" />
-    <Compile Include="TwinObjects\TwinResult.py" />
     <Compile Include="__init__.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TwinObjects\" />
-    <Folder Include="TwinObjects\__pycache__\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TwinObjects\__pycache__\TwinData.cpython-312.pyc" />
-    <Content Include="TwinObjects\__pycache__\TwinResult.cpython-312.pyc" />
+    <Folder Include="py_model\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

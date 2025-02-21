@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Python.Runtime;
+using MyGrasshopperPluginCore.PythonNET.Convertors;
 
 namespace MyGrasshopperPluginCore.PythonNET
 {
@@ -52,6 +53,12 @@ namespace MyGrasshopperPluginCore.PythonNET
 
                 PythonEngine.Initialize();
                 IsInitialized = true;
+
+                var dataEncoder = new CS2Py_DataEncoder();
+                var resultDecoder = new Py2CS_ResultDecoder();
+                PyObjectConversions.RegisterEncoder(dataEncoder);
+                PyObjectConversions.RegisterDecoder(resultDecoder);
+
                 return;
             }
             catch (Exception e)
