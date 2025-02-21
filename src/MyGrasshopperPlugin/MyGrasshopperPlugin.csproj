@@ -47,6 +47,9 @@
   <ItemGroup>
     <ProjectReference Include="..\MyGrasshopperPluginCore\MyGrasshopperPluginCore.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GH_Model\" />
+  </ItemGroup>
 
   <Target Name="CopyPdbForMonoDebugging" AfterTargets="AfterBuild">
     <!-- Enable debugging in Rhino 6/7 on Mac -->

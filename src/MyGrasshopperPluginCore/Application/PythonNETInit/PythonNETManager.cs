@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Python.Runtime;
-using MyGrasshopperPluginCore.PythonNET.Convertors;
+using MyGrasshopperPluginCore.Converters;
 
-namespace MyGrasshopperPluginCore.PythonNET
+namespace MyGrasshopperPluginCore.Application.PythonNETInit
 {
-    public static class PythonNET
+    public static class PythonNETManager
     {
-        public static bool IsInitialized { get; set; }  = false;
+        public static bool IsInitialized { get; set; } = false;
 
         /// <summary>
         /// Initializes the Python engine. This method must be called before using any methods from the Python.Runtime namespace.
@@ -52,13 +52,8 @@ namespace MyGrasshopperPluginCore.PythonNET
                 PythonEngine.PythonPath = Environment.GetEnvironmentVariable("PYTHONPATH", EnvironmentVariableTarget.Process);
 
                 PythonEngine.Initialize();
+                Main.RegisterConverters();
                 IsInitialized = true;
-
-                var dataEncoder = new CS2Py_DataEncoder();
-                var resultDecoder = new Py2CS_ResultDecoder();
-                PyObjectConversions.RegisterEncoder(dataEncoder);
-                PyObjectConversions.RegisterDecoder(resultDecoder);
-
                 return;
             }
             catch (Exception e)
@@ -72,9 +67,9 @@ namespace MyGrasshopperPluginCore.PythonNET
         /// </summary>
         public static void ShutDown()
         {
-            if (!IsInitialized) 
+            if (!IsInitialized)
             {
-                return ; //nothing to do
+                return; //nothing to do
             }
             //else Python is initialized and must be closed
             try

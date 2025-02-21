@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MyGrasshopperPluginCore.PythonNET;
-using MyGrasshopperPluginCore.CS_Model;
-using MyGrasshopperPluginCore.Application;
-
 using Python.Runtime;
+using MyGrasshopperPluginCore.CS_Model;
+using MyGrasshopperPluginCore.Application.PythonNETInit;
+using MyGrasshopperPluginCore.Application.PythonNETSolvers;
 
 namespace MyGrasshopperPluginTests.Application
 {
@@ -20,18 +19,18 @@ namespace MyGrasshopperPluginTests.Application
         [TestInitialize]
         public void Initialize()
         {
-            condaEnvPath = Config.condaEnvPath;
-            pythonDllName = Config.pythonDllName;
+            condaEnvPath = PythonNETConfig.condaEnvPath;
+            pythonDllName = PythonNETConfig.pythonDllName;
             scriptDir = Path.GetFullPath(Path.Combine(
                 Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "src", "MyPythonScripts"));
 
-            PythonNET.Initialize(condaEnvPath, pythonDllName, scriptDir);
+            PythonNETManager.Initialize(condaEnvPath, pythonDllName, scriptDir);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            PythonNET.ShutDown();
+            PythonNETManager.ShutDown();
         }
 
         [TestMethod]
@@ -49,7 +48,7 @@ namespace MyGrasshopperPluginTests.Application
             CS_Result result = new CS_Result();
             try
             {
-                result = PythonNETSolver.SolveComplexScript(csData);
+                result = ComplexScriptSolver.Solve(csData);
             }
             catch (PythonException ex)
             {

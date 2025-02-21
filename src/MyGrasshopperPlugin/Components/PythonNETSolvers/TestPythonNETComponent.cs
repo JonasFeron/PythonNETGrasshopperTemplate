@@ -1,4 +1,4 @@
-//PythonNETGrasshopperTemplate
+﻿//PythonNETGrasshopperTemplate
 
 //Copyright <2025> <Jonas Feron>
 
@@ -39,78 +39,73 @@
 //------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
-using static MyGrasshopperPlugin.GH_Model.Convert;
-using MyGrasshopperPluginCore.Application;
-using MyGrasshopperPluginCore.CS_Model;
-using MyGrasshopperPluginCore.PythonNET;
+using MyGrasshopperPluginCore.Application.PythonNETInit;
+using MyGrasshopperPluginCore.Application.PythonNETSolvers;
 
-namespace MyGrasshopperPlugin.PythonNETComponents
+namespace MyGrasshopperPlugin.Components
 {
-    public class aPythonNETGHComponent : GH_Component
+    public class TestPythonNETComponent : GH_Component
     {
 
-        public aPythonNETGHComponent()
-          : base("aPythonNETComponent", "ExecutePython.NET",
-                "This is a component that shows how to transfer complex data between the main Grasshopper/C# component and the python script.\n" +
-                "For instance:\n" +
-                "this script takes as input in Grasshopper/C#: a list, a number of columns and a number of rows \n" +
-                "These input are sent to python\n" +
-                "Python turns the list into a Numpy array of shape (rowNumber,colNumber)\n" +
-                "then the Numpy array is returned in C#/Grasshopper as a Tree",
-              AccessToAll.GHAssemblyName, AccessToAll.GHComponentsFolder1)
+        public TestPythonNETComponent()
+          : base("TestPythonNET", "test_script.py",
+              "Test to check if Python.NET works well.",
+              AccessToAll.GHAssemblyName, AccessToAll.GHComponentsFolder0)
         {
         }
 
+        /// <summary>
+        /// Registers all the input parameters for this component.
+        /// </summary>
+        /// <param name="pManager">The input parameter manager.</param>
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("A List of Numbers", "list", "A list of numbers to be converted in python into a Numpy array with rowNumber rows and colNumber columns", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Row Number", "rowNumber", "The Number of Rows of the returned Numpy array", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Column Number", "colNumber", "The Number of Columns of the returned Numpy array", GH_ParamAccess.item);
+            pManager.AddTextParameter("TextToLower", "ToLower", "a string argument to be lowercase", GH_ParamAccess.item);
+            pManager.AddTextParameter("TextToUpper", "ToUpper", "a string argument to be uppercase", GH_ParamAccess.item);
         }
 
+        /// <summary>
+        /// Registers all the output parameters for this component.
+        /// </summary>
+        /// <param name="pManager">The output parameter manager.</param>
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddNumberParameter("Grasshopper tree", "tree", "A python numpy array converted back into a Grasshopper tree", GH_ParamAccess.tree);
+            pManager.AddTextParameter("Result text", "result", "string0.ToLower + string1.ToUpper", GH_ParamAccess.item);
         }
 
-
+        /// <summary>
+        /// This Grasshopper component executes the Python script "test_script.py" with the arguments "str0" and "str1".
+        /// </summary>
+        /// <param name="DA">The data access object for retrieving input and setting output.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-
-            if (!PythonNET.IsInitialized)
+            if (!PythonNETManager.IsInitialized)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Python has not been started. Please start the 'StartPython.NET' component first.");
                 return;
             }
-            //if (!File.Exists(Path.Combine(AccessToAll.pythonProjectDirectory, pythonScript+".py")))
-            //{
-            //    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Please ensure that \"{pythonScript}\" is located in: {AccessToAll.pythonProjectDirectory}");
-            //    return;
-            //}
 
-            //1) Collect Data
+            string str0 = "";
+            string str1 = "";
 
-            var list = new List<GH_Number>();
-            int row = 0;
-            int col = 0;
+            if (!DA.GetData(0, ref str0)) { return; }
+            if (!DA.GetData(1, ref str1)) { return; }
 
-            if (!DA.GetDataList(0, list)) { return; }
-            if (!DA.GetData(1, ref row)) { return; }
-            if (!DA.GetData(2, ref col)) { return; }
-
-            var csData = new CS_Data(ToDouble(list), row, col);
-
-            var csResult = new CS_Result();
-            csResult = PythonNETSolver.SolveComplexScript(csData);
-
-            DA.SetDataTree(0, ToTree(csResult.Matrix));
+            string result = "";
+            try
+            {
+                result = TestScriptSolver.Solve(str0, str1);
+            }
+            catch (Exception ex)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+            }
+            finally
+            {
+                DA.SetData(0, result);
+            }
         }
-
-
-
 
         /// <summary>
         /// Provides an Icon for the component.
@@ -119,8 +114,6 @@ namespace MyGrasshopperPlugin.PythonNETComponents
         {
             get
             {
-                //You can add image files to your project resources and access them like this:
-                // return Resources.IconForThisComponent;
                 return null;
             }
         }
@@ -130,8 +123,7 @@ namespace MyGrasshopperPlugin.PythonNETComponents
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("e35a0cc7-b1c3-452c-8193-87a648485379"); }
+            get { return new Guid("f817f8e2-0688-4057-9622-736f04be82d8"); }
         }
-
     }
 }

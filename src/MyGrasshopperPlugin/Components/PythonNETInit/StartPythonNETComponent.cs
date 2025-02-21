@@ -42,20 +42,19 @@ using System;
 using Grasshopper.Kernel;
 using System.IO;
 using Python.Runtime;
-using MyGrasshopperPluginCore.PythonNET;
+using MyGrasshopperPluginCore.Application.PythonNETInit;
 
-namespace MyGrasshopperPlugin.PythonInitComponents
+namespace MyGrasshopperPlugin.Components
 {
     public class StartPythonNETComponent : GH_Component
     {
-        #region Properties
         private static string default_anacondaPath
         {
             get
             {
-                if (Config.anacondaPath != null)
+                if (PythonNETConfig.anacondaPath != null)
                 {
-                    return Config.anacondaPath;
+                    return PythonNETConfig.anacondaPath;
                 }
                 else
                 {
@@ -68,9 +67,9 @@ namespace MyGrasshopperPlugin.PythonInitComponents
         {
             get
             {
-                if (Config.pythonDllName != null)
+                if (PythonNETConfig.pythonDllName != null)
                 {
-                    return Config.pythonDllName;
+                    return PythonNETConfig.pythonDllName;
                 }
                 else
                 {
@@ -79,7 +78,6 @@ namespace MyGrasshopperPlugin.PythonInitComponents
             }
         }
 
-        #endregion Properties
 
         public StartPythonNETComponent()
           : base("StartPython.NET", "StartPy",
@@ -133,82 +131,19 @@ namespace MyGrasshopperPlugin.PythonInitComponents
             if (!DA.GetData(3, ref _condaEnvName)) return;
             if (!DA.GetData(4, ref _pythonDllName)) return;
 
-
-
-            //2) Check validity of Data ?
-            #region Check Data
-            AccessToAll.user_mode = _user_mode;
-
-            if (AccessToAll.user_mode && !Directory.Exists(Config.rootDirectory))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check that {AccessToAll.GHAssemblyName} has been correctly installed in: {AccessToAll.specialFolder}");
-                return;
-            }
-            if (!AccessToAll.user_mode && !Directory.Exists(Config.rootDirectory)) //Developer mode
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check the path to {Config.rootDirectory}");
-                return;
-            }
-
-
-            try
-            {
-                Config.anacondaPath = _anacondaPath;
-            }
-            catch (ArgumentException e)
-            {
-                string default_msg = $"Please provide a valid path, similar to: {default_anacondaPath}";
-                if (_anacondaPath == default_anacondaPath)
-                {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Impossible to find a valid Anaconda3 Installation. " + default_msg);
-                    return;
-                }
-                else
-                {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message + default_msg);
-                    return;
-                }
-            }
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"A valid Anaconda3 installation was found here: {Config.anacondaPath}");
-
-
-            try
-            {
-                Config.condaEnvName = _condaEnvName;
-            }
-            catch (ArgumentException e)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
-                return;
-            }
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"\"{Config.condaEnvName}\" is a valid anaconda environment");
-
-
-            try
-            {
-                Config.pythonDllName = _pythonDllName;
-            }
-            catch (ArgumentException e)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
-                return;
-            }
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"{Config.pythonDllName} is a valid .dll file");
-
-
-            #endregion Check Data
-
+            //2) Check validity of user input ?
+            ConfigurePythonNET(_user_mode, _anacondaPath, _condaEnvName, _pythonDllName);
 
             //3) Initialize Python.NET, following https://github.com/pythonnet/pythonnet/wiki/Using-Python.NET-with-Virtual-Environments
 
-            if (start && PythonNET.IsInitialized)
+            if (start && PythonNETManager.IsInitialized)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Python.NET is already started.");
                 return;
             }
-            if (start && !PythonNET.IsInitialized) 
+            if (start && !PythonNETManager.IsInitialized) 
             {
-                PythonNET.Initialize(Config.condaEnvPath, Config.pythonDllName, Config.pythonProjectDirectory);
+                PythonNETManager.Initialize(PythonNETConfig.condaEnvPath, PythonNETConfig.pythonDllName, AccessToAll.pythonProjectDirectory);
 
                 
                 var m_threadState = PythonEngine.BeginAllowThreads();
@@ -223,9 +158,9 @@ namespace MyGrasshopperPlugin.PythonInitComponents
 
             if (!start)
             {
-                PythonNET.ShutDown();
+                PythonNETManager.ShutDown();
             }
-            if (!PythonNET.IsInitialized)
+            if (!PythonNETManager.IsInitialized)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Python.NET is closed. Please restart Python.NET.");
             }
@@ -233,13 +168,91 @@ namespace MyGrasshopperPlugin.PythonInitComponents
         }
 
         /// <summary>
-        /// When Grasshopper is closed, stop the pythonManager
+        /// When Grasshopper is closed, stop the PythonNETInit engine.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="doc"></param>
         private void DocumentClose(GH_DocumentServer sender, GH_Document doc)
         {
-            PythonNET.ShutDown();
+            PythonNETManager.ShutDown();
+        }
+
+
+        /// <summary>
+        /// Checks the user input for validity and sets the configuration accordingly.
+        /// </summary>
+        /// <param name="userMode">Indicates whether the user mode is enabled.</param>
+        /// <param name="anacondaPath">The path to the Anaconda installation directory.</param>
+        /// <param name="condaEnvName">The name of the conda environment to activate.</param>
+        /// <param name="pythonDllName">The name of the python DLL file.</param>
+        private void ConfigurePythonNET(bool userMode, string anacondaPath, string condaEnvName, string pythonDllName)
+        {
+            #region rootDirectory and pythonProjectDirectory
+            AccessToAll.user_mode = userMode;
+
+            if (AccessToAll.user_mode && !Directory.Exists(AccessToAll.rootDirectory)) //User mode
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check that {AccessToAll.GHAssemblyName} has been correctly installed in: {AccessToAll.specialFolder}");
+                return;
+            }
+            if (!AccessToAll.user_mode && !Directory.Exists(AccessToAll.rootDirectory)) //Developer mode
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check the path to {AccessToAll.rootDirectory}");
+                return;
+            }
+            if (!Directory.Exists(AccessToAll.pythonProjectDirectory))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Check the path to {AccessToAll.pythonProjectDirectory}");
+                return;
+            }
+            #endregion rootDirectory and pythonProjectDirectory
+
+            #region PythonNET configuration (anacondaPath, condaEnvName, pythonDllName)
+            //anacondaPath
+            try
+            {
+                PythonNETConfig.anacondaPath = anacondaPath;
+            }
+            catch (ArgumentException e)
+            {
+                string default_msg = $"Please provide a valid path, similar to: {default_anacondaPath}";
+                if (anacondaPath == default_anacondaPath)
+                {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Impossible to find a valid Anaconda3 Installation. " + default_msg);
+                    return;
+                }
+                else
+                {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message + default_msg);
+                    return;
+                }
+            }
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"A valid Anaconda3 installation was found here: {PythonNETConfig.anacondaPath}");
+
+            //condaEnvName
+            try
+            {
+                PythonNETConfig.condaEnvName = condaEnvName;
+            }
+            catch (ArgumentException e)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
+                return;
+            }
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"\"{PythonNETConfig.condaEnvName}\" is a valid anaconda environment");
+
+            //pythonDllName
+            try
+            {
+                PythonNETConfig.pythonDllName = pythonDllName;
+            }
+            catch (ArgumentException e)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e.Message);
+                return;
+            }
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, $"{PythonNETConfig.pythonDllName} is a valid .dll file");
+            #endregion PythonNET configuration (anacondaPath, condaEnvName, pythonDllName)
         }
 
 
@@ -263,6 +276,10 @@ namespace MyGrasshopperPlugin.PythonInitComponents
         {
             get { return new Guid("05f48156-22ca-4125-a32f-15a1cd8b27e6"); }
         }
+
+
+
+
 
 
 

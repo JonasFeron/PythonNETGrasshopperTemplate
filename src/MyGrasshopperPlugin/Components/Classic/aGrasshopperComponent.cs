@@ -26,7 +26,7 @@ using System;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace MyGrasshopperPlugin.GHComponents
+namespace MyGrasshopperPlugin.Components
 {
     public class aGrasshopperComponent : GH_Component
     {

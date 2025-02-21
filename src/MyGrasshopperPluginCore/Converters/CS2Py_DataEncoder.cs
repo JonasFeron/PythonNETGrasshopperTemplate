@@ -1,7 +1,7 @@
 using MyGrasshopperPluginCore.CS_Model;
 using Python.Runtime;
 
-namespace MyGrasshopperPluginCore.PythonNET.Convertors
+namespace MyGrasshopperPluginCore.Converters
 {
     public class CS2Py_DataEncoder : IPyObjectEncoder
     {

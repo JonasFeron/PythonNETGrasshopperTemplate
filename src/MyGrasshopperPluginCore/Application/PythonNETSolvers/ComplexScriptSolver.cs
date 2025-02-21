@@ -4,11 +4,11 @@ using MyGrasshopperPluginCore.CS_Model;
 using Python.Runtime;
 using Rhino.Runtime;
 
-namespace MyGrasshopperPluginCore.Application
+namespace MyGrasshopperPluginCore.Application.PythonNETSolvers
 {
-    public static class PythonNETSolver
+    public static class ComplexScriptSolver
     {
-        public static CS_Result? SolveComplexScript(CS_Data csData)
+        public static CS_Result? Solve(CS_Data csData)
         {
             string pythonScript = "complex_script";
             var m_threadState = PythonEngine.BeginAllowThreads();

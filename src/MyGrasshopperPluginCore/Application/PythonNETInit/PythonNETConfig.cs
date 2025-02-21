@@ -45,10 +45,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyGrasshopperPluginCore.PythonNET
+namespace MyGrasshopperPluginCore.Application.PythonNETInit
 {
 
-    public static class Config
+    public static class PythonNETConfig
     {
 
         #region Properties
@@ -121,7 +121,7 @@ namespace MyGrasshopperPluginCore.PythonNET
                 {
                     _condaEnvName = value;
                 }
-                else if (File.Exists(Path.Combine(anacondaPath, "envs", value, "python.exe")))               
+                else if (File.Exists(Path.Combine(anacondaPath, "envs", value, "python.exe")))
                 {
                     _condaEnvName = value;
                 }
@@ -155,7 +155,7 @@ namespace MyGrasshopperPluginCore.PythonNET
         }
 
         private static string _pythonDllName = null;
-        public static string pythonDllName 
+        public static string pythonDllName
         {
             get
             {
@@ -190,41 +190,6 @@ namespace MyGrasshopperPluginCore.PythonNET
                 }
             }
         }
-
-
-
-        /// <summary>
-        /// Gets the root directory (containing the solution, the python and C# projects, the temporary folder,...).
-        /// </summary>
-        public static string rootDirectory
-        {
-            get
-            {
-
-                var currentDirectory = Directory.GetCurrentDirectory(); //rootDirectory/MyGrasshopperPlugIn.Core/bin/Debug/net48/
-                for (int i = 0; i < 4; i++) //rootDirectory is 4 levels above the current directory
-                {
-                    currentDirectory = Directory.GetParent(currentDirectory).FullName;
-                }
-                return currentDirectory;
-
-            }
-        }
-
-
-        /// <summary>
-        /// Gets the python project directory (containing the python scripts,...).
-        /// </summary>
-        public static string pythonProjectDirectory
-        {
-            get { return Path.Combine(rootDirectory, "MyPythonScripts"); }
-        }
-
-        public static string tempDirectory
-        {
-            get { return Path.Combine(rootDirectory, ".temp"); }
-        }
-
         #endregion Properties
     }
 }
